@@ -1,0 +1,6 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="<%= projectName %>">
+  <h1>Welcome to <%= projectName %></h1>
+</Layout>

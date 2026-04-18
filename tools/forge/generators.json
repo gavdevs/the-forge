@@ -24,6 +24,11 @@
       "factory": "./src/generators/desktop/generator",
       "schema": "./src/generators/desktop/schema.json",
       "description": "Generate a Tauri v2 desktop app wrapping the web SPA"
+    },
+    "static": {
+      "factory": "./src/generators/static/generator",
+      "schema": "./src/generators/static/schema.json",
+      "description": "Generate an Astro + Hono ISR static site with page cache"
     }
   }
 }

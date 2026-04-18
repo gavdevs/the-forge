@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "$id": "ForgeStatic",
+  "title": "Forge Static Generator",
+  "type": "object",
+  "properties": {
+    "database": {
+      "type": "string",
+      "enum": ["sqlite", "postgres"],
+      "default": "sqlite",
+      "description": "Database for page cache"
+    },
+    "targetDir": {
+      "type": "string",
+      "description": "Absolute path to the generated project root."
+    }
+  },
+  "required": []
+}

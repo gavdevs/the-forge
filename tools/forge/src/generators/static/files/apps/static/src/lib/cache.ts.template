@@ -1,0 +1,43 @@
+<% if (database === 'sqlite') { %>
+import Database from 'better-sqlite3';
+
+const db = new Database(process.env.CACHE_DB_PATH ?? './data/page-cache.db');
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS page_cache (
+    url TEXT PRIMARY KEY,
+    html TEXT NOT NULL,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER
+  )
+`);
+
+export function getCachedPage(url: string): string | null {
+  const row = db.prepare('SELECT html, expires_at FROM page_cache WHERE url = ?').get(url) as { html: string; expires_at: number | null } | undefined;
+  if (!row) return null;
+  if (row.expires_at && row.expires_at < Date.now()) {
+    db.prepare('DELETE FROM page_cache WHERE url = ?').run(url);
+    return null;
+  }
+  return row.html;
+}
+
+export function setCachedPage(url: string, html: string, ttlMs?: number): void {
+  const expiresAt = ttlMs ? Date.now() + ttlMs : null;
+  db.prepare('INSERT OR REPLACE INTO page_cache (url, html, cached_at, expires_at) VALUES (?, ?, ?, ?)').run(url, html, Date.now(), expiresAt);
+}
+
+export function invalidateCache(url?: string): void {
+  if (url) {
+    db.prepare('DELETE FROM page_cache WHERE url = ?').run(url);
+  } else {
+    db.prepare('DELETE FROM page_cache').run();
+  }
+}
+<% } else { %>
+// Postgres cache implementation — use drizzle-orm with pgTable
+// TODO: implement postgres variant
+export function getCachedPage(_url: string): string | null { return null; }
+export function setCachedPage(_url: string, _html: string, _ttlMs?: number): void {}
+export function invalidateCache(_url?: string): void {}
+<% } %>
