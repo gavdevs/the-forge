@@ -82,25 +82,24 @@ async function main(): Promise<void> {
   }
 
   // Step 3: Install dependencies
-  s.start('Installing dependencies...');
+  s.stop('Installing dependencies...');
   try {
-    execSync('pnpm install', { cwd: projectRoot, stdio: 'pipe', timeout: 120000 });
-    s.stop('Dependencies installed.');
+    execSync('pnpm install', { cwd: projectRoot, stdio: 'inherit', timeout: 180000 });
+    p.log.success('Dependencies installed.');
   } catch {
-    s.stop('Dependencies install failed — run pnpm install manually.');
+    p.log.warn('Dependencies install failed — run `pnpm install` manually.');
   }
 
   // Step 4: Initialize git
-  s.start('Initializing git...');
-  const gitRoot = isOpenSource ? moveTarget : projectRoot;
   try {
+    const gitRoot = isOpenSource ? moveTarget : projectRoot;
     execSync('git init && git add -A && git commit -m "chore: initial project scaffold from the forge"', {
       cwd: gitRoot,
       stdio: 'pipe',
     });
-    s.stop('Git initialized.');
+    p.log.success('Git initialized.');
   } catch {
-    s.stop('Git init skipped.');
+    p.log.warn('Git init skipped.');
   }
 
   p.outro(`Project created at ${projectRoot}. Happy forging!`);
