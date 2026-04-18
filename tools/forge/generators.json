@@ -29,6 +29,11 @@
       "factory": "./src/generators/static/generator",
       "schema": "./src/generators/static/schema.json",
       "description": "Generate an Astro + Hono ISR static site with page cache"
+    },
+    "feature": {
+      "factory": "./src/generators/feature/generator",
+      "schema": "./src/generators/feature/schema.json",
+      "description": "Generate a cross-app feature scaffold"
     }
   }
 }
