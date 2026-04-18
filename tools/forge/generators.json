@@ -1,3 +1,9 @@
 {
-  "generators": {}
+  "generators": {
+    "workspace": {
+      "factory": "./src/generators/workspace/generator",
+      "schema": "./src/generators/workspace/schema.json",
+      "description": "Generate a new forge project workspace"
+    }
+  }
 }

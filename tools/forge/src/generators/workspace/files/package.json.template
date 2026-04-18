@@ -1,0 +1,13 @@
+{
+  "name": "<%= name %>",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nx run-many --target=dev",
+    "build": "nx run-many --target=build",
+    "test": "nx run-many --target=test",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write ."
+  }
+}

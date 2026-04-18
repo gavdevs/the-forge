@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "$id": "ForgeWorkspace",
+  "title": "Forge Workspace Generator",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Project name",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What is the project name?"
+    },
+    "projectType": {
+      "type": "string",
+      "description": "Project type",
+      "enum": ["standalone", "open-source"],
+      "default": "standalone",
+      "x-prompt": {
+        "message": "What type of project?",
+        "type": "list",
+        "items": [
+          { "value": "standalone", "label": "Standalone — everything in one repo" },
+          { "value": "open-source", "label": "Open-source — parent wrapper hides AI tooling" }
+        ]
+      }
+    },
+    "database": {
+      "type": "string",
+      "description": "Database choice",
+      "enum": ["sqlite", "postgres"],
+      "default": "sqlite"
+    },
+    "styling": {
+      "type": "string",
+      "description": "Styling approach",
+      "enum": ["tailwind", "panda"],
+      "default": "tailwind"
+    }
+  },
+  "required": ["name"]
+}
