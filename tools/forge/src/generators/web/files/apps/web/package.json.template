@@ -10,24 +10,24 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "react": "*",
-    "react-dom": "*",
-    "@tanstack/react-router": "*",
-    "@tanstack/react-query": "*",
-    "@trpc/client": "*",
-    "@trpc/react-query": "*",
-    "better-auth": "*",
-<% if (styling === 'tailwind') { %>    "tailwindcss": "*"
-<% } else { %>    "@ark-ui/react": "*"
+    "react": "latest",
+    "react-dom": "latest",
+    "@tanstack/react-router": "latest",
+    "@tanstack/react-query": "latest",
+    "@trpc/client": "latest",
+    "@trpc/react-query": "latest",
+    "better-auth": "latest",
+<% if (styling === 'tailwind') { %>    "tailwindcss": "latest"
+<% } else { %>    "@ark-ui/react": "latest"
 <% } %>  },
   "devDependencies": {
-    "@vitejs/plugin-react": "*",
-    "@types/react": "*",
-    "@types/react-dom": "*",
-    "vite": "*",
-    "vitest": "*",
-    "typescript": "*",
-<% if (styling === 'tailwind') { %>    "@tailwindcss/vite": "*"
-<% } else { %>    "@pandacss/dev": "*"
+    "@vitejs/plugin-react": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "vite": "latest",
+    "vitest": "latest",
+    "typescript": "latest",
+<% if (styling === 'tailwind') { %>    "@tailwindcss/vite": "latest"
+<% } else { %>    "@pandacss/dev": "latest"
 <% } %>  }
 }

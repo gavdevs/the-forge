@@ -79,14 +79,14 @@ ${database === 'sqlite' ? '    volumes:\n      - ./data:/app/data\n' : ''}    re
 }
 
 const OPTIONAL_DEPS: Record<string, { deps?: Record<string, string>; devDeps?: Record<string, string> }> = {
-  ai: { deps: { 'ai': '*', '@ai-sdk/anthropic': '*' } },
-  agents: { deps: { '@mastra/core': '*', '@mastra/engine': '*' } },
-  payments: { deps: { '@polar-sh/sdk': '*' } },
-  email: { deps: { 'resend': '*', '@react-email/components': '*' } },
+  ai: { deps: { 'ai': 'latest', '@ai-sdk/anthropic': 'latest' } },
+  agents: { deps: { '@mastra/core': 'latest', '@mastra/engine': 'latest' } },
+  payments: { deps: { '@polar-sh/sdk': 'latest' } },
+  email: { deps: { 'resend': 'latest', 'react-email': 'latest' } },
   realtime: {},
-  cron: { deps: { 'node-cron': '*' }, devDeps: { '@types/node-cron': '*' } },
+  cron: { deps: { 'node-cron': 'latest' }, devDeps: { '@types/node-cron': 'latest' } },
   vector: {},
-  observability: { deps: { '@opentelemetry/sdk-node': '*', '@opentelemetry/auto-instrumentations-node': '*', '@opentelemetry/exporter-trace-otlp-http': '*' } },
+  observability: { deps: { '@opentelemetry/sdk-node': 'latest', '@opentelemetry/auto-instrumentations-node': 'latest', '@opentelemetry/exporter-trace-otlp-http': 'latest' } },
 };
 
 function addOptionalDependencies(tree: Tree, projectRoot: string, optionals: string[], database: string): void {
@@ -109,7 +109,7 @@ function addOptionalDependencies(tree: Tree, projectRoot: string, optionals: str
 
     // Special case: vector depends on database choice
     if (feature === 'vector' && database === 'sqlite') {
-      pkg.dependencies = { ...pkg.dependencies, 'sqlite-vec': '^0.1.0' };
+      pkg.dependencies = { ...pkg.dependencies, 'sqlite-vec': 'latest' };
     }
   }
 

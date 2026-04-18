@@ -12,22 +12,22 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "hono": "*",
-    "@hono/node-server": "*",
-    "@hono/trpc-server": "*",
-    "@trpc/server": "*",
-    "drizzle-orm": "*",
-    "better-auth": "*",
-    "zod": "*",
-<% if (database === 'sqlite') { %>    "better-sqlite3": "*"
-<% } else { %>    "postgres": "*"
+    "hono": "latest",
+    "@hono/node-server": "latest",
+    "@hono/trpc-server": "latest",
+    "@trpc/server": "latest",
+    "drizzle-orm": "latest",
+    "better-auth": "latest",
+    "zod": "latest",
+<% if (database === 'sqlite') { %>    "better-sqlite3": "latest"
+<% } else { %>    "postgres": "latest"
 <% } %>  },
   "devDependencies": {
-    "tsx": "*",
-    "tsup": "*",
-    "drizzle-kit": "*",
-<% if (database === 'sqlite') { %>    "@types/better-sqlite3": "*",
-<% } %>    "vitest": "*",
-    "typescript": "*"
+    "tsx": "latest",
+    "tsup": "latest",
+    "drizzle-kit": "latest",
+<% if (database === 'sqlite') { %>    "@types/better-sqlite3": "latest",
+<% } %>    "vitest": "latest",
+    "typescript": "latest"
   }
 }

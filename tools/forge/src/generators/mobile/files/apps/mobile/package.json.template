@@ -10,25 +10,25 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "expo": "*",
-    "expo-router": "*",
-    "expo-linking": "*",
-    "expo-status-bar": "*",
-    "react": "*",
-    "react-native": "*",
-    "react-native-safe-area-context": "*",
-    "react-native-screens": "*",
-    "nativewind": "*",
-    "tailwindcss": "*",
-    "@tanstack/react-query": "*",
-    "@trpc/client": "*",
-    "@trpc/react-query": "*",
-    "better-auth": "*"
+    "expo": "latest",
+    "expo-router": "latest",
+    "expo-linking": "latest",
+    "expo-status-bar": "latest",
+    "react": "latest",
+    "react-native": "latest",
+    "react-native-safe-area-context": "latest",
+    "react-native-screens": "latest",
+    "nativewind": "latest",
+    "tailwindcss": "latest",
+    "@tanstack/react-query": "latest",
+    "@trpc/client": "latest",
+    "@trpc/react-query": "latest",
+    "better-auth": "latest"
   },
   "devDependencies": {
-    "typescript": "*",
-    "@types/react": "*",
-    "@types/react-native": "*",
-    "vitest": "*"
+    "typescript": "latest",
+    "@types/react": "latest",
+    "@types/react-native": "latest",
+    "vitest": "latest"
   }
 }
