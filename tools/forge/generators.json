@@ -4,6 +4,11 @@
       "factory": "./src/generators/workspace/generator",
       "schema": "./src/generators/workspace/schema.json",
       "description": "Generate a new forge project workspace"
+    },
+    "api": {
+      "factory": "./src/generators/api/generator",
+      "schema": "./src/generators/api/schema.json",
+      "description": "Generate a Hono + tRPC + Drizzle + Better Auth API app"
     }
   }
 }

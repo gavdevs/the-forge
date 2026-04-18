@@ -1,0 +1,10 @@
+<% if (database === 'sqlite') { %>
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+<% } else { %>
+import { pgTable, text, integer, serial } from 'drizzle-orm/pg-core';
+<% } %>
+
+// Auth schema is in ../auth/authSchema.ts
+// Feature-specific schemas are added by the feature generator.
+
+export {};

@@ -1,0 +1,25 @@
+import { betterAuth } from 'better-auth';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+<% if (database === 'sqlite') { %>
+import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+
+const sqlite = new Database(process.env.DATABASE_URL?.replace('file:', '') ?? './data/<%= projectName %>.db');
+const db = drizzle(sqlite);
+<% } else { %>
+import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
+
+const client = postgres(process.env.DATABASE_URL ?? 'postgresql://user:password@localhost:5432/<%= projectName %>');
+const db = drizzle(client);
+<% } %>
+
+export const auth = betterAuth({
+  database: drizzleAdapter(db),
+  emailAndPassword: {
+    enabled: true,
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+  },
+});
