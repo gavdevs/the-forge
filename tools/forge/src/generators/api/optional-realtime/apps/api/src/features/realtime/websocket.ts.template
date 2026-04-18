@@ -1,0 +1,22 @@
+import { Hono } from 'hono';
+import { createBunWebSocket } from 'hono/bun';
+
+const { upgradeWebSocket, websocket } = createBunWebSocket();
+
+export const wsApp = new Hono();
+
+wsApp.get(
+  '/ws',
+  upgradeWebSocket(() => ({
+    onMessage(event, ws) {
+      // Handle incoming messages
+      console.log('Message received:', event.data);
+      ws.send(JSON.stringify({ type: 'ack' }));
+    },
+    onClose() {
+      console.log('WebSocket closed');
+    },
+  })),
+);
+
+export { websocket };

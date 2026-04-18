@@ -1,0 +1,5 @@
+import { router, publicProcedure } from '../../../trpc';
+
+export const paymentsRouter = router({
+  // Webhook handler, subscription status, etc.
+});

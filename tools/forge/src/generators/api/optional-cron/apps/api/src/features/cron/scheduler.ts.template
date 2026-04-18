@@ -1,0 +1,7 @@
+import cron from 'node-cron';
+
+export function startScheduler(): void {
+  // Register cron jobs here
+  // Example: cron.schedule('*/5 * * * *', () => { ... });
+  console.log('Cron scheduler started');
+}

@@ -61,4 +61,70 @@ describe('api generator', () => {
 
     expect(tree.exists('apps/api/Dockerfile')).toBeTruthy();
   });
+
+  // Optional feature tests
+  it('should create AI feature files when ai is selected', async () => {
+    await apiGenerator(tree, { database: 'sqlite', optionalFeatures: ['ai'] });
+
+    expect(tree.exists('apps/api/src/features/ai/router.ts')).toBeTruthy();
+    expect(tree.exists('apps/api/src/features/ai/service.ts')).toBeTruthy();
+    expect(tree.exists('apps/api/src/features/ai/types.ts')).toBeTruthy();
+
+    const content = tree.read('apps/api/package.json', 'utf-8')!;
+    const pkg = JSON.parse(content);
+    expect(pkg.dependencies).toHaveProperty('ai');
+  });
+
+  it('should create email feature files when email is selected', async () => {
+    await apiGenerator(tree, { database: 'sqlite', optionalFeatures: ['email'] });
+
+    expect(tree.exists('apps/api/src/features/email/router.ts')).toBeTruthy();
+    expect(tree.exists('apps/api/src/features/email/service.ts')).toBeTruthy();
+    expect(tree.exists('apps/api/src/features/email/templates/Welcome.tsx')).toBeTruthy();
+
+    const content = tree.read('apps/api/package.json', 'utf-8')!;
+    const pkg = JSON.parse(content);
+    expect(pkg.dependencies).toHaveProperty('resend');
+  });
+
+  it('should create realtime feature files when realtime is selected', async () => {
+    await apiGenerator(tree, { database: 'sqlite', optionalFeatures: ['realtime'] });
+
+    expect(tree.exists('apps/api/src/features/realtime/websocket.ts')).toBeTruthy();
+  });
+
+  it('should create cron feature files when cron is selected', async () => {
+    await apiGenerator(tree, { database: 'sqlite', optionalFeatures: ['cron'] });
+
+    expect(tree.exists('apps/api/src/features/cron/scheduler.ts')).toBeTruthy();
+    expect(tree.exists('apps/api/src/features/cron/jobs/example.ts')).toBeTruthy();
+
+    const content = tree.read('apps/api/package.json', 'utf-8')!;
+    const pkg = JSON.parse(content);
+    expect(pkg.dependencies).toHaveProperty('node-cron');
+  });
+
+  it('should create vector search files when vector is selected', async () => {
+    await apiGenerator(tree, { database: 'sqlite', optionalFeatures: ['vector'] });
+
+    expect(tree.exists('apps/api/src/db/vector.ts')).toBeTruthy();
+  });
+
+  it('should create observability files when observability is selected', async () => {
+    await apiGenerator(tree, { database: 'sqlite', optionalFeatures: ['observability'] });
+
+    expect(tree.exists('apps/api/src/lib/telemetry.ts')).toBeTruthy();
+
+    const content = tree.read('apps/api/package.json', 'utf-8')!;
+    const pkg = JSON.parse(content);
+    expect(pkg.dependencies).toHaveProperty('@opentelemetry/sdk-node');
+  });
+
+  it('should handle multiple optional features', async () => {
+    await apiGenerator(tree, { database: 'sqlite', optionalFeatures: ['ai', 'cron', 'observability'] });
+
+    expect(tree.exists('apps/api/src/features/ai/router.ts')).toBeTruthy();
+    expect(tree.exists('apps/api/src/features/cron/scheduler.ts')).toBeTruthy();
+    expect(tree.exists('apps/api/src/lib/telemetry.ts')).toBeTruthy();
+  });
 });

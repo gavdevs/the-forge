@@ -1,0 +1,11 @@
+import { router, publicProcedure } from '../../../trpc';
+import { z } from 'zod';
+
+export const agentsRouter = router({
+  run: publicProcedure
+    .input(z.object({ agentId: z.string(), input: z.string() }))
+    .mutation(async ({ input }): Promise<{ result: string }> => {
+      // TODO: implement with Mastra
+      return { result: '' };
+    }),
+});

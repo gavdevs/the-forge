@@ -1,0 +1,8 @@
+import { z } from 'zod';
+
+export const generateInputSchema = z.object({
+  prompt: z.string(),
+  model: z.string().optional(),
+});
+
+export type GenerateInput = z.infer<typeof generateInputSchema>;

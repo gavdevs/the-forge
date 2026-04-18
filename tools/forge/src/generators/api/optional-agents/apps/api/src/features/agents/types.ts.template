@@ -1,0 +1,8 @@
+import { z } from 'zod';
+
+export const agentRunInputSchema = z.object({
+  agentId: z.string(),
+  input: z.string(),
+});
+
+export type AgentRunInput = z.infer<typeof agentRunInputSchema>;

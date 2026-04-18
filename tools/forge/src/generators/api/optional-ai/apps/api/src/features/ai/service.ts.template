@@ -1,0 +1,4 @@
+// AI service — Vercel AI SDK integration
+// Use generateText, streamText, generateObject from 'ai' package
+
+export {};

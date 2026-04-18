@@ -1,0 +1,6 @@
+import cron from 'node-cron';
+
+// Example cron job — runs every 5 minutes
+cron.schedule('*/5 * * * *', () => {
+  console.log('Example cron job executed at', new Date().toISOString());
+});

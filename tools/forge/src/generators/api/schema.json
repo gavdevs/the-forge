@@ -10,6 +10,11 @@
       "default": "sqlite",
       "description": "Database engine"
     },
+    "optionalFeatures": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional features to include: ai, agents, payments, email, realtime, cron, vector, observability"
+    },
     "targetDir": {
       "type": "string",
       "description": "Absolute path to the generated project root. Required when running from forge CLI."

@@ -1,0 +1,17 @@
+<% if (database === 'sqlite') { %>
+// Vector search setup — sqlite-vec extension
+// See: https://github.com/asg017/sqlite-vec
+
+export function initVectorSearch(): void {
+  // Load sqlite-vec extension
+  // db.loadExtension('vec0');
+}
+<% } else { %>
+// Vector search setup — pgvector
+// See: https://github.com/pgvector/pgvector
+
+export function initVectorSearch(): void {
+  // Enable pgvector extension
+  // CREATE EXTENSION IF NOT EXISTS vector;
+}
+<% } %>
