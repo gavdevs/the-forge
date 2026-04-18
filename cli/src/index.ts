@@ -90,7 +90,16 @@ async function main(): Promise<void> {
     p.log.warn('Dependencies install failed — run `pnpm install` manually.');
   }
 
-  // Step 4: Initialize git
+  // Step 4: Configure Nx AI agents (MCP server, skills, enhanced AGENTS.md)
+  s.start('Configuring AI agents...');
+  try {
+    execSync('npx nx configure-ai-agents --no-interactive', { cwd: projectRoot, stdio: 'pipe', timeout: 60000 });
+    s.stop('AI agents configured.');
+  } catch {
+    s.stop('AI agent setup skipped — run `npx nx configure-ai-agents` manually.');
+  }
+
+  // Step 5: Initialize git
   try {
     const gitRoot = isOpenSource ? moveTarget : projectRoot;
     execSync('git init && git add -A && git commit -m "chore: initial project scaffold from the forge"', {

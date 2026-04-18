@@ -33,6 +33,27 @@ export async function featureGenerator(
     }
   }
 
+  // Add CLAUDE.md stubs per feature directory for agent context
+  for (const app of apps) {
+    const featureDir = getFeatureDir(projectRoot, app, name);
+    if (featureDir) {
+      tree.write(joinPathFragments(featureDir, 'CLAUDE.md'), `# ${className} Feature (${app})
+
+## Summary
+<!-- What this feature does — filled in after implementation -->
+
+## Business Rules
+<!-- Key constraints and invariants -->
+
+## Schemas
+<!-- Zod schemas and their purpose -->
+
+## Relations
+<!-- How this feature connects to other features -->
+`);
+    }
+  }
+
   // Add shared schema
   const sharedSchemaPath = joinPathFragments(projectRoot, `packages/shared/src/schemas/${name}.ts`);
   tree.write(sharedSchemaPath, `import { z } from 'zod';
@@ -179,6 +200,21 @@ export default function ${className}Island(): React.ReactElement {
 }
 `,
   );
+}
+
+function getFeatureDir(root: string, app: string, name: string): string | null {
+  switch (app) {
+    case 'api':
+      return joinPathFragments(root, `apps/api/src/features/${name}`);
+    case 'web':
+      return joinPathFragments(root, `apps/web/src/features/${name}`);
+    case 'mobile':
+      return joinPathFragments(root, `apps/mobile/src/features/${name}`);
+    case 'static':
+      return joinPathFragments(root, `apps/static/src/pages/${name}`);
+    default:
+      return null;
+  }
 }
 
 export default featureGenerator;
