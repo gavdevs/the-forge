@@ -19,6 +19,11 @@
       "factory": "./src/generators/mobile/generator",
       "schema": "./src/generators/mobile/schema.json",
       "description": "Generate an Expo + React Native + NativeWind mobile app"
+    },
+    "desktop": {
+      "factory": "./src/generators/desktop/generator",
+      "schema": "./src/generators/desktop/schema.json",
+      "description": "Generate a Tauri v2 desktop app wrapping the web SPA"
     }
   }
 }
