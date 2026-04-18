@@ -144,45 +144,9 @@ function createProjectPlugin(tree: Tree, projectDir: string, projectName: string
     ),
   );
 
-  // Feature generator placeholder — replaced with real implementation in Task 15
-  tree.write(
-    joinPathFragments(pluginDir, 'src/generators/feature/generator.ts'),
-    [
-      "import { Tree } from '@nx/devkit';",
-      "import type { FeatureGeneratorSchema } from './schema';",
-      '',
-      'export async function featureGenerator(tree: Tree, options: FeatureGeneratorSchema): Promise<void> {',
-      '  // TODO: implement feature generator',
-      '}',
-      '',
-      'export default featureGenerator;',
-      '',
-    ].join('\n'),
-  );
-
-  tree.write(
-    joinPathFragments(pluginDir, 'src/generators/feature/schema.json'),
-    JSON.stringify(
-      {
-        $schema: 'https://json-schema.org/schema',
-        $id: 'Feature',
-        title: 'Feature Generator',
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Feature name' },
-          apps: { type: 'string', description: 'Comma-separated list of apps (api,web,mobile,desktop,static)' },
-        },
-        required: ['name', 'apps'],
-      },
-      null,
-      2,
-    ),
-  );
-
-  tree.write(
-    joinPathFragments(pluginDir, 'src/generators/feature/schema.d.ts'),
-    'export interface FeatureGeneratorSchema {\n  name: string;\n  apps: string;\n}\n',
-  );
+  // Copy real feature generator from forge into the project-plugin
+  const featureGenSource = resolve(forgeRoot, 'tools/forge/src/generators/feature');
+  copyDirectoryFromDisk(featureGenSource, joinPathFragments(pluginDir, 'src/generators/feature'), tree);
 }
 
 export default workspaceGenerator;
