@@ -79,14 +79,14 @@ ${database === 'sqlite' ? '    volumes:\n      - ./data:/app/data\n' : ''}    re
 }
 
 const OPTIONAL_DEPS: Record<string, { deps?: Record<string, string>; devDeps?: Record<string, string> }> = {
-  ai: { deps: { 'ai': '^4.0.0', '@ai-sdk/anthropic': '^1.0.0' } },
-  agents: { deps: { '@mastra/core': '^0.5.0', '@mastra/engine': '^0.5.0' } },
-  payments: { deps: { '@polar-sh/sdk': '^1.0.0' } },
-  email: { deps: { 'resend': '^4.0.0', '@react-email/components': '^0.0.30' } },
+  ai: { deps: { 'ai': '*', '@ai-sdk/anthropic': '*' } },
+  agents: { deps: { '@mastra/core': '*', '@mastra/engine': '*' } },
+  payments: { deps: { '@polar-sh/sdk': '*' } },
+  email: { deps: { 'resend': '*', '@react-email/components': '*' } },
   realtime: {},
-  cron: { deps: { 'node-cron': '^3.0.0' }, devDeps: { '@types/node-cron': '^3.0.0' } },
+  cron: { deps: { 'node-cron': '*' }, devDeps: { '@types/node-cron': '*' } },
   vector: {},
-  observability: { deps: { '@opentelemetry/sdk-node': '^0.57.0', '@opentelemetry/auto-instrumentations-node': '^0.57.0', '@opentelemetry/exporter-trace-otlp-http': '^0.57.0' } },
+  observability: { deps: { '@opentelemetry/sdk-node': '*', '@opentelemetry/auto-instrumentations-node': '*', '@opentelemetry/exporter-trace-otlp-http': '*' } },
 };
 
 function addOptionalDependencies(tree: Tree, projectRoot: string, optionals: string[], database: string): void {

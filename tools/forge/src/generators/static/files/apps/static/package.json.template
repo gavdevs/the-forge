@@ -10,21 +10,21 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "astro": "^5.0.0",
-    "@astrojs/react": "^4.0.0",
-    "@astrojs/node": "^9.0.0",
-    "hono": "^4.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "drizzle-orm": "^0.35.0",
-<% if (database === 'sqlite') { %>    "better-sqlite3": "^11.0.0"
-<% } else { %>    "postgres": "^3.4.0"
+    "astro": "*",
+    "@astrojs/react": "*",
+    "@astrojs/node": "*",
+    "hono": "*",
+    "react": "*",
+    "react-dom": "*",
+    "drizzle-orm": "*",
+<% if (database === 'sqlite') { %>    "better-sqlite3": "*"
+<% } else { %>    "postgres": "*"
 <% } %>  },
   "devDependencies": {
-    "typescript": "^5.6.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-<% if (database === 'sqlite') { %>    "@types/better-sqlite3": "^7.0.0",
-<% } %>    "vitest": "^2.0.0"
+    "typescript": "*",
+    "@types/react": "*",
+    "@types/react-dom": "*",
+<% if (database === 'sqlite') { %>    "@types/better-sqlite3": "*",
+<% } %>    "vitest": "*"
   }
 }

@@ -9,5 +9,8 @@
     "test": "nx run-many --target=test",
     "lint": "biome check .",
     "lint:fix": "biome check --write ."
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": []
   }
 }
