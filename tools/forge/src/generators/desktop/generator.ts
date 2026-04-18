@@ -17,11 +17,8 @@ export async function desktopGenerator(
   const projectRoot = options.targetDir ?? '.';
   const projectName = readProjectName(tree, projectRoot);
 
-  // Desktop requires web app to exist
-  const webPkgPath = joinPathFragments(projectRoot, 'apps/web/package.json');
-  if (!tree.exists(webPkgPath)) {
-    throw new Error('Desktop generator requires the web app to exist. Generate the web app first.');
-  }
+  // Note: Desktop requires web app. The CLI validates this in prompts
+  // and ensures web is generated before desktop.
 
   generateFiles(
     tree,

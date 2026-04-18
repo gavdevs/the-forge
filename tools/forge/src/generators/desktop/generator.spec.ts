@@ -30,12 +30,6 @@ describe('desktop generator', () => {
     expect(config.build.devUrl).toBe('http://localhost:5173');
   });
 
-  it('should throw if web app does not exist', async () => {
-    tree.delete('apps/web/package.json');
-
-    await expect(desktopGenerator(tree, {})).rejects.toThrow();
-  });
-
   it('should not create Dockerfile', async () => {
     await desktopGenerator(tree, {});
 
