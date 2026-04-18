@@ -3,7 +3,7 @@ import * as p from '@clack/prompts';
 import { execSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync, renameSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { runPrompts } from './prompts';
 
 const cliDir = dirname(fileURLToPath(import.meta.url));
@@ -31,8 +31,11 @@ async function main(): Promise<void> {
     ? resolve(process.cwd(), `${options.name}-wrapper`)
     : targetDir;
 
+  if (existsSync(moveTarget)) {
+    execSync(`rm -rf "${moveTarget}"`, { stdio: 'pipe' });
+  }
   mkdirSync(dirname(moveTarget), { recursive: true });
-  renameSync(generatedDir, moveTarget);
+  execSync(`mv "${generatedDir}" "${moveTarget}"`, { stdio: 'pipe' });
   s.stop('Workspace created.');
 
   // Resolve the actual project root (where apps/ lives)
