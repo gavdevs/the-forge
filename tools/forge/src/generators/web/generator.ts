@@ -1,0 +1,66 @@
+import {
+  Tree,
+  generateFiles,
+  joinPathFragments,
+  readJson,
+} from '@nx/devkit';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import type { WebGeneratorSchema } from './schema';
+
+const generatorDir = dirname(fileURLToPath(import.meta.url));
+
+export async function webGenerator(
+  tree: Tree,
+  options: WebGeneratorSchema,
+): Promise<void> {
+  const styling = options.styling ?? 'tailwind';
+  const projectRoot = options.targetDir ?? '.';
+  const projectName = readProjectName(tree, projectRoot);
+
+  generateFiles(
+    tree,
+    joinPathFragments(generatorDir, 'files'),
+    projectRoot,
+    {
+      styling,
+      projectName,
+      template: '',
+    },
+  );
+
+  // Create empty directories
+  tree.write(joinPathFragments(projectRoot, 'apps/web/src/features/.gitkeep'), '');
+  tree.write(joinPathFragments(projectRoot, 'apps/web/src/components/.gitkeep'), '');
+  tree.write(joinPathFragments(projectRoot, 'apps/web/src/hooks/.gitkeep'), '');
+
+  // Add web service to docker-compose.yml
+  updateDockerCompose(tree, projectRoot);
+}
+
+function readProjectName(tree: Tree, projectRoot: string): string {
+  const pkgPath = joinPathFragments(projectRoot, 'package.json');
+  if (tree.exists(pkgPath)) {
+    const pkg = readJson(tree, pkgPath);
+    return pkg.name || 'my-app';
+  }
+  return 'my-app';
+}
+
+function updateDockerCompose(tree: Tree, projectRoot: string): void {
+  const composePath = joinPathFragments(projectRoot, 'docker-compose.yml');
+  const existing = tree.read(composePath, 'utf-8') ?? '';
+
+  const webService = `  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+`;
+
+  tree.write(composePath, existing + webService);
+}
+
+export default webGenerator;

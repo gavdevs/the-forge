@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "$id": "ForgeWeb",
+  "title": "Forge Web Generator",
+  "type": "object",
+  "properties": {
+    "styling": {
+      "type": "string",
+      "enum": ["tailwind", "panda"],
+      "default": "tailwind",
+      "description": "Styling approach"
+    },
+    "targetDir": {
+      "type": "string",
+      "description": "Absolute path to the generated project root."
+    }
+  },
+  "required": []
+}

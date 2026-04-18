@@ -9,6 +9,11 @@
       "factory": "./src/generators/api/generator",
       "schema": "./src/generators/api/schema.json",
       "description": "Generate a Hono + tRPC + Drizzle + Better Auth API app"
+    },
+    "web": {
+      "factory": "./src/generators/web/generator",
+      "schema": "./src/generators/web/schema.json",
+      "description": "Generate a React + Vite + TanStack Router web app"
     }
   }
 }
