@@ -14,6 +14,11 @@
       "factory": "./src/generators/web/generator",
       "schema": "./src/generators/web/schema.json",
       "description": "Generate a React + Vite + TanStack Router web app"
+    },
+    "mobile": {
+      "factory": "./src/generators/mobile/generator",
+      "schema": "./src/generators/mobile/schema.json",
+      "description": "Generate an Expo + React Native + NativeWind mobile app"
     }
   }
 }

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "$id": "ForgeMobile",
+  "title": "Forge Mobile Generator",
+  "type": "object",
+  "properties": {
+    "targetDir": {
+      "type": "string",
+      "description": "Absolute path to the generated project root."
+    }
+  },
+  "required": []
+}
