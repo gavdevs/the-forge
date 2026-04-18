@@ -38,6 +38,10 @@
       "description": "Styling approach",
       "enum": ["tailwind", "panda"],
       "default": "tailwind"
+    },
+    "targetDir": {
+      "type": "string",
+      "description": "Absolute output path. When set, project is created here instead of relative to tree root."
     }
   },
   "required": ["name"]

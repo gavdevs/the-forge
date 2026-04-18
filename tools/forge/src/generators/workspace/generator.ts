@@ -21,6 +21,7 @@ export async function workspaceGenerator(
   const styling = options.styling ?? 'tailwind';
 
   // Determine output paths
+  // Nx tree only supports relative paths — the CLI moves output to user's cwd after generation
   const isOpenSource = projectType === 'open-source';
   const wrapperDir = isOpenSource ? `${options.name}-wrapper` : null;
   const projectDir = isOpenSource

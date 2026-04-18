@@ -3,4 +3,5 @@ export interface WorkspaceGeneratorSchema {
   projectType: 'standalone' | 'open-source';
   database: 'sqlite' | 'postgres';
   styling: 'tailwind' | 'panda';
+  targetDir?: string;
 }
