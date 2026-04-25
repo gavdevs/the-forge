@@ -7,7 +7,7 @@
     "test": "nx run-many --target=test",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "setup": "pnpm install && pnpm --filter @forge/cli run build && cd cli && pnpm link --global"
+    "setup": "pnpm install && pnpm --filter @forge/cli run build && node ./scripts/link-cli.js"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.12",
