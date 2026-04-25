@@ -14,8 +14,6 @@
     "skipLibCheck": true,
     "declaration": true,
     "sourceMap": true,
-    "paths": {
-      "forge": ["tools/forge/src/index.ts"]
-    }
+    "paths": {}
   }
 }
