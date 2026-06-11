@@ -1,5 +1,5 @@
+import { readJson, type Tree } from '@nx/devkit';
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
-import { Tree, readJson } from '@nx/devkit';
 import { workspaceGenerator } from './generator';
 
 describe('workspace generator', () => {
@@ -26,6 +26,42 @@ describe('workspace generator', () => {
     expect(tree.exists('my-app/.gitignore')).toBeTruthy();
     expect(tree.exists('my-app/.env.example')).toBeTruthy();
     expect(tree.exists('my-app/docker-compose.yml')).toBeTruthy();
+  });
+
+  it('should create pnpm 11 build-script approvals', async () => {
+    await workspaceGenerator(tree, {
+      name: 'my-app',
+      projectType: 'standalone',
+      database: 'sqlite',
+      styling: 'tailwind',
+    });
+
+    const workspace = tree.read('my-app/pnpm-workspace.yaml', 'utf-8');
+    const pkg = readJson(tree, 'my-app/package.json');
+
+    expect(workspace).toContain('allowBuilds:');
+    expect(workspace).toContain("  '@swc/core': true");
+    expect(workspace).toContain('  esbuild: true');
+    expect(workspace).toContain('  nx: true');
+    expect(workspace).toContain('  unrs-resolver: true');
+    expect(pkg.pnpm).toBeUndefined();
+  });
+
+  it('should create Biome 2 configuration', async () => {
+    await workspaceGenerator(tree, {
+      name: 'my-app',
+      projectType: 'standalone',
+      database: 'sqlite',
+      styling: 'tailwind',
+    });
+
+    const biomeConfig = readJson(tree, 'my-app/biome.json');
+    const packageBiomeConfig = readJson(tree, 'my-app/packages/config/biome.json');
+
+    expect(biomeConfig.$schema).toBe('https://biomejs.dev/schemas/2.4.12/schema.json');
+    expect(biomeConfig.organizeImports).toBeUndefined();
+    expect(biomeConfig.assist.actions.source.organizeImports).toBe('on');
+    expect(packageBiomeConfig.root).toBe(false);
   });
 
   it('should create agent config files for standalone', async () => {

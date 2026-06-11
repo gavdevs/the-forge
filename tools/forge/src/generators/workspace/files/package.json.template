@@ -16,8 +16,5 @@
     "@biomejs/biome": "latest",
     "typescript": "latest",
     "vitest": "latest"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": []
   }
 }
