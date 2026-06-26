@@ -8,15 +8,18 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@clack/prompts": "^0.8.0",
     "nx": "latest"
   },
   "devDependencies": {
+    "@clack/prompts": "^0.8.0",
     "tsx": "^4.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.4"
   }
 }

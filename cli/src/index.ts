@@ -4,15 +4,39 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as p from '@clack/prompts';
-import { runPrompts } from './prompts';
+import { parseArgs, printUsage, resolveOptions } from './prompts';
 
 const cliDir = dirname(fileURLToPath(import.meta.url));
 const forgeRoot = resolve(cliDir, '..', '..');
 
 async function main(): Promise<void> {
-  const nameArg = process.argv[2];
-  const options = await runPrompts(nameArg);
-  if (!options) return;
+  // Skip argv[0] (node) and argv[1] (script). What remains is user input.
+  const userArgv = process.argv.slice(2);
+
+  let parsed: ReturnType<typeof parseArgs>;
+  try {
+    parsed = parseArgs(userArgv);
+  } catch (err) {
+    printUsage(err instanceof Error ? err.message : String(err));
+    process.exit(2);
+  }
+
+  if (parsed.showHelp) {
+    printUsage();
+    return;
+  }
+
+  // Default to non-interactive when stdin is not a TTY (e.g. piped from
+  // an agent). The flag parser already forces non-interactive whenever
+  // any flag is passed.
+  const tty = process.stdin.isTTY === true;
+  const nonInteractive = parsed.nonInteractive || !tty;
+
+  const options = await resolveOptions(parsed.positional, parsed.flags, nonInteractive);
+  if (!options) {
+    // resolveOptions already printed the appropriate message
+    process.exit(parsed.flagsPresent ? 2 : 1);
+  }
 
   const targetDir = resolve(process.cwd(), options.name);
   const isOpenSource = options.projectType === 'open-source';
@@ -86,12 +110,12 @@ async function main(): Promise<void> {
   }
 
   // Step 3: Install dependencies
-  s.stop('Installing dependencies...');
+  s.start('Installing dependencies...');
   try {
     execSync('pnpm install', { cwd: projectRoot, stdio: 'inherit', timeout: 180000 });
-    p.log.success('Dependencies installed.');
+    s.stop('Dependencies installed.');
   } catch {
-    p.log.warn('Dependencies install failed — run `pnpm install` manually.');
+    s.stop('Dependencies install failed — run `pnpm install` manually.');
   }
 
   // Step 3b: Sync Python dependencies for a Python API app (uv)
@@ -129,9 +153,9 @@ async function main(): Promise<void> {
         stdio: 'pipe',
       },
     );
-    p.log.success('Git initialized.');
+    s.stop('Git initialized.');
   } catch {
-    p.log.warn('Git init skipped.');
+    s.stop('Git init skipped.');
   }
 
   p.outro(`Project created at ${projectRoot}. Happy forging!`);
@@ -148,4 +172,7 @@ function runForgeGenerator(args: string): void {
   });
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
