@@ -4,6 +4,12 @@
   "title": "Forge API Generator",
   "type": "object",
   "properties": {
+    "framework": {
+      "type": "string",
+      "enum": ["hono", "python"],
+      "default": "hono",
+      "description": "Backend framework — Hono (TypeScript) or Python (FastAPI)"
+    },
     "database": {
       "type": "string",
       "enum": ["sqlite", "postgres"],
@@ -13,7 +19,7 @@
     "optionalFeatures": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Optional features to include: ai, agents, payments, email, realtime, cron, vector, observability"
+      "description": "Optional features for the Hono framework: ai, agents, payments, email, realtime, cron, vector, observability"
     },
     "targetDir": {
       "type": "string",

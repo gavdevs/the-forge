@@ -24,6 +24,7 @@ describe('api generator', () => {
     expect(tree.exists('apps/api/src/auth/authSchema.ts')).toBeTruthy();
     expect(tree.exists('apps/api/src/auth/authRoutes.ts')).toBeTruthy();
     expect(tree.exists('apps/api/src/features/.gitkeep')).toBeTruthy();
+    expect(tree.exists('apps/api/AGENTS.md')).toBeTruthy();
   });
 
   it('should create package.json with correct dependencies', async () => {
@@ -126,5 +127,115 @@ describe('api generator', () => {
     expect(tree.exists('apps/api/src/features/ai/router.ts')).toBeTruthy();
     expect(tree.exists('apps/api/src/features/cron/scheduler.ts')).toBeTruthy();
     expect(tree.exists('apps/api/src/lib/telemetry.ts')).toBeTruthy();
+  });
+});
+
+describe('api generator: framework python', () => {
+  let tree: Tree;
+
+  beforeEach(() => {
+    tree = createTreeWithEmptyWorkspace();
+    tree.write('apps/.gitkeep', '');
+    tree.write('docker-compose.yml', 'services: {}\n');
+  });
+
+  it('should create the python app structure', async () => {
+    await apiGenerator(tree, { framework: 'python', database: 'sqlite' });
+
+    expect(tree.exists('apps/api/pyproject.toml')).toBeTruthy();
+    expect(tree.exists('apps/api/project.json')).toBeTruthy();
+    expect(tree.exists('apps/api/src/app/main.py')).toBeTruthy();
+    expect(tree.exists('apps/api/src/app/config.py')).toBeTruthy();
+    expect(tree.exists('apps/api/src/app/db.py')).toBeTruthy();
+    expect(tree.exists('apps/api/src/app/models/base.py')).toBeTruthy();
+    expect(tree.exists('apps/api/src/app/models/item.py')).toBeTruthy();
+    expect(tree.exists('apps/api/src/app/schemas/item.py')).toBeTruthy();
+    expect(tree.exists('apps/api/src/app/routers/items.py')).toBeTruthy();
+    expect(tree.exists('apps/api/alembic/env.py')).toBeTruthy();
+    expect(tree.exists('apps/api/alembic/versions/0001_create_items.py')).toBeTruthy();
+    expect(tree.exists('apps/api/alembic/script.py.mako')).toBeTruthy();
+    expect(tree.exists('apps/api/tests/conftest.py')).toBeTruthy();
+    expect(tree.exists('apps/api/tests/test_health.py')).toBeTruthy();
+    expect(tree.exists('apps/api/tests/test_items.py')).toBeTruthy();
+    expect(tree.exists('apps/api/Dockerfile')).toBeTruthy();
+    expect(tree.exists('apps/api/.env.example')).toBeTruthy();
+    expect(tree.exists('apps/api/README.md')).toBeTruthy();
+    expect(tree.exists('apps/api/AGENTS.md')).toBeTruthy();
+  });
+
+  it('should not create hono/drizzle files', async () => {
+    await apiGenerator(tree, { framework: 'python', database: 'sqlite' });
+
+    expect(tree.exists('apps/api/src/index.ts')).toBeFalsy();
+    expect(tree.exists('apps/api/package.json')).toBeFalsy();
+    expect(tree.exists('apps/api/src/db/schema.ts')).toBeFalsy();
+  });
+
+  it('should declare fastapi/sqlalchemy/alembic deps in pyproject.toml', async () => {
+    await apiGenerator(tree, { framework: 'python', database: 'sqlite' });
+
+    const content = tree.read('apps/api/pyproject.toml', 'utf-8')!;
+    expect(content).toContain('fastapi');
+    expect(content).toContain('sqlalchemy[asyncio]');
+    expect(content).toContain('alembic');
+    expect(content).toContain('pydantic-settings');
+    expect(content).toContain('uvicorn[standard]');
+  });
+
+  it('should use the sqlite driver (aiosqlite) for sqlite', async () => {
+    await apiGenerator(tree, { framework: 'python', database: 'sqlite' });
+
+    const pyproject = tree.read('apps/api/pyproject.toml', 'utf-8')!;
+    expect(pyproject).toContain('aiosqlite');
+    expect(pyproject).not.toContain('asyncpg');
+
+    const envExample = tree.read('apps/api/.env.example', 'utf-8')!;
+    expect(envExample).toContain('sqlite+aiosqlite');
+    expect(envExample).not.toContain('postgresql+asyncpg');
+  });
+
+  it('should use the postgres driver (asyncpg) for postgres', async () => {
+    await apiGenerator(tree, { framework: 'python', database: 'postgres' });
+
+    const pyproject = tree.read('apps/api/pyproject.toml', 'utf-8')!;
+    expect(pyproject).toContain('asyncpg');
+    expect(pyproject).not.toContain('aiosqlite');
+
+    const envExample = tree.read('apps/api/.env.example', 'utf-8')!;
+    expect(envExample).toContain('postgresql+asyncpg');
+    expect(envExample).not.toContain('sqlite+aiosqlite');
+  });
+
+  it('should define Nx targets in project.json', async () => {
+    await apiGenerator(tree, { framework: 'python', database: 'sqlite' });
+
+    const content = tree.read('apps/api/project.json', 'utf-8')!;
+    const project = JSON.parse(content);
+    expect(project.name).toMatch(/-api$/);
+    expect(project.targets).toHaveProperty('serve');
+    expect(project.targets.serve.options.command).toContain('uvicorn');
+    expect(project.targets).toHaveProperty('test');
+    expect(project.targets.test.options.command).toContain('pytest');
+    expect(project.targets).toHaveProperty('migrate');
+    expect(project.targets.migrate.options.command).toContain('alembic upgrade head');
+  });
+
+  it('should write alembic script.py.mako verbatim (mako interpolation intact)', async () => {
+    await apiGenerator(tree, { framework: 'python', database: 'sqlite' });
+
+    const mako = tree.read('apps/api/alembic/script.py.mako', 'utf-8')!;
+    const O = '$' + '{';
+    expect(mako).toContain(`${O}message`);
+    expect(mako).toContain(`${O}revision`);
+    expect(mako).toContain('def upgrade');
+    expect(mako).toContain('def downgrade');
+  });
+
+  it('should add the api service to docker-compose.yml with port 8000', async () => {
+    await apiGenerator(tree, { framework: 'python', database: 'sqlite' });
+
+    const content = tree.read('docker-compose.yml', 'utf-8')!;
+    expect(content).toContain('api:');
+    expect(content).toContain('8000:8000');
   });
 });

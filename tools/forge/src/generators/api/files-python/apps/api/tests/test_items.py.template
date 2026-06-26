@@ -1,0 +1,17 @@
+async def test_create_list_get_items(client):
+    response = await client.post("/items", json={"name": "Widget"})
+    assert response.status_code == 201
+    created = response.json()
+    assert created["name"] == "Widget"
+    item_id = created["id"]
+
+    response = await client.get("/items")
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+
+    response = await client.get(f"/items/{item_id}")
+    assert response.status_code == 200
+    assert response.json()["name"] == "Widget"
+
+    response = await client.get("/items/999")
+    assert response.status_code == 404

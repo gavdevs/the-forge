@@ -4,6 +4,7 @@ export interface ForgeOptions {
   name: string;
   projectType: 'standalone' | 'open-source';
   apps: string[];
+  backendFramework: 'hono' | 'python';
   database: 'sqlite' | 'postgres';
   styling: 'tailwind' | 'panda';
   optionalFeatures: string[];
@@ -12,17 +13,22 @@ export interface ForgeOptions {
 export async function runPrompts(nameArg?: string): Promise<ForgeOptions | null> {
   p.intro('The Forge — Project Generator');
 
-  const name = nameArg ?? await p.text({
-    message: 'Project name:',
-    placeholder: 'my-app',
-    validate: (value) => {
-      if (!value) return 'Name is required';
-      if (!/^[a-z0-9-]+$/.test(value)) return 'Use lowercase letters, numbers, and hyphens only';
-      return undefined;
-    },
-  });
+  const name =
+    nameArg ??
+    (await p.text({
+      message: 'Project name:',
+      placeholder: 'my-app',
+      validate: (value) => {
+        if (!value) return 'Name is required';
+        if (!/^[a-z0-9-]+$/.test(value)) return 'Use lowercase letters, numbers, and hyphens only';
+        return undefined;
+      },
+    }));
 
-  if (p.isCancel(name)) { p.cancel('Cancelled.'); return null; }
+  if (p.isCancel(name)) {
+    p.cancel('Cancelled.');
+    return null;
+  }
 
   const projectType = await p.select({
     message: 'Project type:',
@@ -32,12 +38,15 @@ export async function runPrompts(nameArg?: string): Promise<ForgeOptions | null>
     ],
   });
 
-  if (p.isCancel(projectType)) { p.cancel('Cancelled.'); return null; }
+  if (p.isCancel(projectType)) {
+    p.cancel('Cancelled.');
+    return null;
+  }
 
   const apps = await p.multiselect({
     message: 'Which apps?',
     options: [
-      { value: 'api', label: 'API (Hono + tRPC + Drizzle + Better Auth)' },
+      { value: 'api', label: 'API (backend)' },
       { value: 'web', label: 'Web (React + Vite + TanStack Router)' },
       { value: 'mobile', label: 'Mobile (Expo + React Native)' },
       { value: 'desktop', label: 'Desktop (Tauri v2 — requires Web)' },
@@ -46,7 +55,10 @@ export async function runPrompts(nameArg?: string): Promise<ForgeOptions | null>
     required: true,
   });
 
-  if (p.isCancel(apps)) { p.cancel('Cancelled.'); return null; }
+  if (p.isCancel(apps)) {
+    p.cancel('Cancelled.');
+    return null;
+  }
 
   // Validate: desktop requires web
   if (apps.includes('desktop') && !apps.includes('web')) {
@@ -62,7 +74,28 @@ export async function runPrompts(nameArg?: string): Promise<ForgeOptions | null>
     ],
   });
 
-  if (p.isCancel(database)) { p.cancel('Cancelled.'); return null; }
+  if (p.isCancel(database)) {
+    p.cancel('Cancelled.');
+    return null;
+  }
+
+  // Backend framework: only ask when the API app is selected.
+  // Hono = TypeScript (supports optional features). Python = FastAPI (no optional features).
+  let backendFramework: 'hono' | 'python' = 'hono';
+  if (apps.includes('api')) {
+    const fw = await p.select({
+      message: 'API framework:',
+      options: [
+        { value: 'hono', label: 'Hono (TypeScript) — Hono + tRPC + Drizzle + Better Auth' },
+        { value: 'python', label: 'Python API (FastAPI + SQLAlchemy + uv)' },
+      ],
+    });
+    if (p.isCancel(fw)) {
+      p.cancel('Cancelled.');
+      return null;
+    }
+    backendFramework = fw;
+  }
 
   const styling = await p.select({
     message: 'Styling:',
@@ -72,31 +105,42 @@ export async function runPrompts(nameArg?: string): Promise<ForgeOptions | null>
     ],
   });
 
-  if (p.isCancel(styling)) { p.cancel('Cancelled.'); return null; }
+  if (p.isCancel(styling)) {
+    p.cancel('Cancelled.');
+    return null;
+  }
 
-  const optionalFeatures = await p.multiselect({
-    message: 'Optional features:',
-    options: [
-      { value: 'ai', label: 'AI (Vercel AI SDK)' },
-      { value: 'agents', label: 'AI Agents (Mastra)' },
-      { value: 'payments', label: 'Payments (Polar)' },
-      { value: 'email', label: 'Email (Resend + React Email)' },
-      { value: 'realtime', label: 'Real-time (Hono WebSockets)' },
-      { value: 'cron', label: 'Cron Jobs (node-cron)' },
-      { value: 'vector', label: 'Vector Search (sqlite-vec / pgvector)' },
-      { value: 'observability', label: 'Observability (OpenTelemetry)' },
-    ],
-    required: false,
-  });
-
-  if (p.isCancel(optionalFeatures)) { p.cancel('Cancelled.'); return null; }
+  // Optional features only apply to the Hono backend.
+  let optionalFeatures: string[] = [];
+  if (apps.includes('api') && backendFramework === 'hono') {
+    const feats = await p.multiselect({
+      message: 'Optional features:',
+      options: [
+        { value: 'ai', label: 'AI (Vercel AI SDK)' },
+        { value: 'agents', label: 'AI Agents (Mastra)' },
+        { value: 'payments', label: 'Payments (Polar)' },
+        { value: 'email', label: 'Email (Resend + React Email)' },
+        { value: 'realtime', label: 'Real-time (Hono WebSockets)' },
+        { value: 'cron', label: 'Cron Jobs (node-cron)' },
+        { value: 'vector', label: 'Vector Search (sqlite-vec / pgvector)' },
+        { value: 'observability', label: 'Observability (OpenTelemetry)' },
+      ],
+      required: false,
+    });
+    if (p.isCancel(feats)) {
+      p.cancel('Cancelled.');
+      return null;
+    }
+    optionalFeatures = (feats as string[]) ?? [];
+  }
 
   return {
     name: name as string,
     projectType: projectType as ForgeOptions['projectType'],
     apps: apps as string[],
+    backendFramework,
     database: database as ForgeOptions['database'],
     styling: styling as ForgeOptions['styling'],
-    optionalFeatures: (optionalFeatures as string[]) ?? [],
+    optionalFeatures,
   };
 }

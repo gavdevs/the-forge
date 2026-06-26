@@ -1,0 +1,84 @@
+# apps/api — Backend (FastAPI / Python)
+
+This is the Python backend, built with **FastAPI + SQLAlchemy 2.0 (async) + Alembic**, managed with **[uv](https://docs.astral.sh/uv/)**. If the project is using the TypeScript backend instead (Hono + tRPC + Drizzle), see `apps/api/AGENTS.md` from the hono scaffold — this file will not exist in that case.
+
+## Stack
+
+- **FastAPI** — async HTTP framework with automatic OpenAPI docs at `/docs`
+- **SQLAlchemy 2.0 (async)** — ORM with type-safe mapped classes
+- **Alembic** — schema migrations
+- **Pydantic v2** — request/response validation via `pydantic.BaseModel` and `pydantic_settings.BaseSettings`
+- **uvicorn** — ASGI server
+- **uv** — dependency and virtual environment manager (replaces pip + venv + requirements.txt)
+- **ruff** — linter and formatter (no black, no flake8)
+- **mypy** — static type checker
+- **pytest + pytest-asyncio + httpx** — testing
+
+## Layout
+
+```
+apps/api/
+├── pyproject.toml         # uv project, deps, ruff/mypy/pytest config
+├── project.json           # Nx targets (serve/test/lint/format/migrate)
+├── alembic.ini            # Alembic config
+├── alembic/
+│   ├── env.py             # async-aware migration runner
+│   ├── script.py.mako     # template for new revisions
+│   └── versions/          # migration scripts
+├── src/app/
+│   ├── main.py            # FastAPI app, lifespan, /health
+│   ├── config.py          # pydantic-settings
+│   ├── db.py              # async engine + session
+│   ├── models/            # SQLAlchemy mapped classes
+│   ├── schemas/           # Pydantic request/response models
+│   └── routers/           # FastAPI APIRouters
+├── tests/                 # pytest suite
+│   ├── conftest.py        # in-memory DB fixture + dependency override
+│   ├── test_health.py
+│   └── test_items.py
+├── Dockerfile
+└── .env.example
+```
+
+## Run / Test / Migrate
+
+```sh
+cd apps/api
+uv sync                              # install deps into .venv (first time and on changes)
+uv run alembic upgrade head          # apply migrations
+uv run uvicorn app.main:app --reload --port 8000
+uv run pytest                        # run the test suite
+uv run ruff check .                  # lint
+uv run ruff format .                 # format
+uv run mypy src                      # type-check
+
+# or via Nx (from project root):
+nx run <%= projectName %>-api:serve
+nx run <%= projectName %>-api:test
+nx run <%= projectName %>-api:migrate
+nx run <%= projectName %>-api:lint
+```
+
+## Conventions
+
+- **No try/except in business logic.** Raise `HTTPException` from routers/services for HTTP-shaped errors; let everything else propagate to FastAPI's default handlers.
+- **All external inputs validated with Pydantic.** FastAPI does this automatically for request bodies and query parameters declared as Pydantic models.
+- **Async by default.** Routers, DB sessions, and external calls are all `async def`. Use `async with` for the session (`async with async_session() as session:`).
+- **No `print()` for logging** — use `logging.getLogger(__name__)`.
+- **Type hints everywhere.** mypy is configured with `strict = true`. New modules must have full annotations.
+- **Migrations are required.** Do not use `Base.metadata.create_all()` to mutate schema — generate an Alembic revision instead (`uv run alembic revision --autogenerate -m "describe change"`).
+- **Configuration via environment.** Read secrets and config from `app.config.settings`, never from `os.environ` directly.
+
+## Tests
+
+Tests use **httpx `AsyncClient`** with FastAPI's `ASGITransport` and a **dependency override** that swaps the database for an in-memory SQLite engine with `StaticPool`. See `tests/conftest.py`. Do not start a real uvicorn process in tests — use the ASGI transport.
+
+Test names describe behavior: `test_create_list_get_items`, not `test_items_crud`.
+
+## Adding a new model / endpoint
+
+1. Define the SQLAlchemy model in `src/app/models/<name>.py` and re-export from `src/app/models/__init__.py`.
+2. Define the Pydantic schemas in `src/app/schemas/<name>.py`.
+3. Create the router in `src/app/routers/<name>.py` and `include_router(...)` it from `main.py`.
+4. Generate a migration: `uv run alembic revision --autogenerate -m "create <name>"`.
+5. Add tests under `tests/test_<name>.py`.

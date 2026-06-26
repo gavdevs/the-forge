@@ -1,0 +1,52 @@
+# <%= projectName %> — Python API
+
+FastAPI + SQLAlchemy 2.0 (async) + Alembic, managed with [uv](https://docs.astral.sh/uv/).
+
+## Prerequisites
+
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) (Python package/env manager)
+- Python 3.12+
+
+## Setup
+
+```sh
+uv sync
+cp .env.example .env   # then edit DATABASE_URL
+uv run alembic upgrade head
+```
+
+## Run
+
+```sh
+uv run uvicorn app.main:app --reload --port 8000
+# or via Nx: nx run <%= projectName %>-api:serve
+```
+
+Health check: http://localhost:8000/health
+
+## Database
+
+<% if (database === 'sqlite') { %>SQLite is the default. The database file lives at `./data/<%= projectName %>.db` (created on first run).<% } else { %>PostgreSQL is configured. Set `DATABASE_URL` in `.env` to your Postgres instance (e.g. `postgresql+asyncpg://user:password@localhost:5432/<%= projectName %>`).<% } %>
+
+Migrations are managed with Alembic:
+
+```sh
+uv run alembic upgrade head                                   # apply
+uv run alembic revision --autogenerate -m "describe change"   # create
+uv run alembic downgrade -1                                   # roll back
+```
+
+## Test
+
+```sh
+uv run pytest
+# or via Nx: nx run <%= projectName %>-api:test
+```
+
+## Lint / Format / Type-check
+
+```sh
+uv run ruff check .
+uv run ruff format .
+uv run mypy src
+```
