@@ -1,6 +1,6 @@
 ---
 name: forge-cli
-description: Scaffold a new TypeScript or Python monorepo from a single command using the Forge CLI. Use when you need to create a new app from scratch — full stack (api + web + mobile + desktop + static), any framework combo — without driving an interactive TUI. Triggers: "scaffold a new app", "create a project with the forge", "set up a new monorepo", "I want to start building X".
+description: "Scaffold a new TypeScript or Python monorepo from a single command using the Forge CLI. Use when you need to create a new app from scratch — full stack (api + web + mobile + desktop + static), Python service, or anything in between."
 ---
 
 # Forge CLI
