@@ -1,0 +1,46 @@
+# apps/mobile — Mobile (Expo + React Native)
+
+## Stack
+
+- **Expo SDK** with **expo-router** (file-based routing)
+- **React Native** with **React 19**
+- **NativeWind** — Tailwind for React Native
+- **TypeScript** strict mode
+
+## Layout
+
+```
+apps/mobile/
+├── app.json               # Expo config
+├── src/
+│   ├── app/               # expo-router file-based routes
+│   ├── components/        # shared UI
+│   ├── features/          # feature code (created by `feature` generator)
+│   └── lib/
+├── assets/
+└── package.json
+```
+
+## Run / Test / Build
+
+```sh
+pnpm --filter @<%= projectName %>/mobile dev               # expo start
+pnpm --filter @<%= projectName %>/mobile test             # vitest run
+pnpm --filter @<%= projectName %>/mobile build:ios        # eas build --platform ios
+pnpm --filter @<%= projectName %>/mobile build:android    # eas build --platform android
+```
+
+For native builds you need an Expo account and EAS CLI configured.
+
+## Conventions
+
+- **Routes are file-based** under `src/app/` via expo-router (`_layout.tsx`, `index.tsx`, `[param].tsx`).
+- **Components**: PascalCase, default export, no `any` props.
+- **Styling**: NativeWind className utilities — keep platform-specific overrides in `style` props, not separate files.
+- **No barrel files** inside `src/`.
+
+## Adding a new feature
+
+```sh
+pnpm nx generate @<%= projectName %>/project-plugin:feature --name <name> --apps mobile
+```

@@ -72,7 +72,6 @@ describe('workspace generator', () => {
       styling: 'tailwind',
     });
 
-    expect(tree.exists('my-app/CLAUDE.md')).toBeTruthy();
     expect(tree.exists('my-app/AGENTS.md')).toBeTruthy();
     expect(tree.exists('my-app/.claude/settings.json')).toBeTruthy();
   });
@@ -85,8 +84,8 @@ describe('workspace generator', () => {
       styling: 'tailwind',
     });
 
-    // Agentic files in wrapper
-    expect(tree.exists('my-app-wrapper/CLAUDE.md')).toBeTruthy();
+    // Agentic file in wrapper (no CLAUDE.md — consolidated into AGENTS.md)
+    expect(tree.exists('my-app-wrapper/CLAUDE.md')).toBeFalsy();
     expect(tree.exists('my-app-wrapper/AGENTS.md')).toBeTruthy();
     expect(tree.exists('my-app-wrapper/.claude/settings.json')).toBeTruthy();
 

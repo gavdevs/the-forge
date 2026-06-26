@@ -33,11 +33,11 @@ export async function featureGenerator(
     }
   }
 
-  // Add CLAUDE.md stubs per feature directory for agent context
+  // Add AGENTS.md stubs per feature directory for agent context
   for (const app of apps) {
     const featureDir = getFeatureDir(projectRoot, app, name);
     if (featureDir) {
-      tree.write(joinPathFragments(featureDir, 'CLAUDE.md'), `# ${className} Feature (${app})
+      tree.write(joinPathFragments(featureDir, 'AGENTS.md'), `# ${className} Feature (${app})
 
 ## Summary
 <!-- What this feature does — filled in after implementation -->

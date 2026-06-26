@@ -56,13 +56,11 @@ export async function workspaceGenerator(
   tree.write(joinPathFragments(projectDir, 'apps/.gitkeep'), '');
 
   if (isOpenSource) {
-    // Agentic files go in wrapper, not in project
-    copyFileFromDisk(resolve(forgeRoot, 'conventions/CLAUDE.md'), joinPathFragments(wrapperDir!, 'CLAUDE.md'), tree);
+    // Agentic file goes in wrapper, not in project
     copyFileFromDisk(resolve(forgeRoot, 'conventions/AGENTS.md'), joinPathFragments(wrapperDir!, 'AGENTS.md'), tree);
     moveFile(tree, joinPathFragments(projectDir, '.claude/settings.json'), joinPathFragments(wrapperDir!, '.claude/settings.json'));
   } else {
-    // Agentic files in project root
-    copyFileFromDisk(resolve(forgeRoot, 'conventions/CLAUDE.md'), joinPathFragments(projectDir, 'CLAUDE.md'), tree);
+    // Agentic file in project root
     copyFileFromDisk(resolve(forgeRoot, 'conventions/AGENTS.md'), joinPathFragments(projectDir, 'AGENTS.md'), tree);
   }
 }

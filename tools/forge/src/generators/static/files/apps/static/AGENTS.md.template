@@ -1,0 +1,40 @@
+# apps/static — Static Site (Astro + Hono ISR)
+
+A statically-generated Astro site with **Incremental Static Regeneration** via an embedded Hono server that revalidates cached pages.
+
+## Stack
+
+- **Astro** — content-first static site framework
+- **Hono** — embedded server for ISR endpoints
+- **React** islands for interactive components
+- **Drizzle ORM** for the cache layer (<% if (database === 'sqlite') { %>SQLite<% } else { %>Postgres<% } %>)
+
+## Layout
+
+```
+apps/static/
+├── src/
+│   ├── pages/             # Astro routes (file-based)
+│   ├── layouts/           # shared layouts
+│   ├── components/        # Astro and React components
+│   └── lib/
+│       └── cache.ts       # ISR cache backed by Drizzle
+├── astro.config.ts
+└── package.json
+```
+
+## Run / Test / Build
+
+```sh
+pnpm --filter @<%= projectName %>/static dev       # astro dev
+pnpm --filter @<%= projectName %>/static build     # astro build
+pnpm --filter @<%= projectName %>/static preview   # serve built output with ISR
+pnpm --filter @<%= projectName %>/static test      # vitest run
+```
+
+## Conventions
+
+- **Pages are `.astro` files** under `src/pages/`. Use `.tsx` only when you need React state.
+- **ISR**: pages opt into revalidation by returning `{ revalidate: <seconds> }` from their frontmatter. The cache lives in the database configured by the project.
+- **No barrel files** inside `src/`.
+- **Shared schemas** with `apps/api` (if present) live in `packages/shared/` — import from there, don't redeclare.

@@ -1,0 +1,51 @@
+# apps/web — Web App (React + Vite + TanStack Router)
+
+## Stack
+
+- **React 19** with **Vite**
+- **TanStack Router** — file-based routing
+- **TanStack Query** — server-state caching
+- **tRPC client** — typesafe RPC against `apps/api`
+- **Better Auth** — auth client
+<% if (styling === 'tailwind') { %>- **Tailwind CSS v4** + shadcn/ui primitives
+<% } else { %>- **Panda CSS** + Ark UI
+<% } %>
+
+## Layout
+
+```
+apps/web/
+├── index.html
+├── src/
+│   ├── main.tsx           # entry: createRouter + QueryClient + tRPC
+│   ├── routes/            # TanStack file-based routes
+│   ├── components/        # shared UI
+│   ├── hooks/             # custom React hooks
+│   ├── features/          # feature-specific code (created by `feature` generator)
+│   └── lib/               # utilities
+├── vite.config.ts
+└── package.json
+```
+
+## Run / Test / Build
+
+```sh
+pnpm --filter @<%= projectName %>/web dev       # vite dev server
+pnpm --filter @<%= projectName %>/web build     # tsc -b && vite build
+pnpm --filter @<%= projectName %>/web test      # vitest run
+pnpm --filter @<%= projectName %>/web preview   # serve built output
+```
+
+## Conventions
+
+- **Routes are file-based** under `src/routes/`. Use TanStack Router's file conventions (`__root.tsx`, `index.tsx`, `$param.tsx`).
+- **Components**: PascalCase, default export, no `any` props. Co-locate small components with the route that owns them; share larger ones via `src/components/`.
+- **Server state** lives in TanStack Query, fed by the tRPC client. Do not call `fetch` directly.
+- **Auth state** lives in the Better Auth client hook. Do not roll your own auth context.
+- **No barrel files** inside `src/` — import directly from the file that owns the export.
+
+## Adding a new feature
+
+```sh
+pnpm nx generate @<%= projectName %>/project-plugin:feature --name <name> --apps web
+```
