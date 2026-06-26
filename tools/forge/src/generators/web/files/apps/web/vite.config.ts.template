@@ -1,21 +1,22 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { tanstackRouter } from '@tanstack/router-plugin/vite';
 <% if (styling === 'tailwind') { %>
 import tailwindcss from '@tailwindcss/vite';
 <% } %>
 
 export default defineConfig({
   plugins: [
+    tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     react(),
 <% if (styling === 'tailwind') { %>    tailwindcss(),
 <% } %>  ],
   server: {
     port: 5173,
     proxy: {
-<% if (apiFramework === 'hono') { %>      '/trpc': 'http://localhost:3000',
+<% if (apiFramework === 'python') { %>      '/api': 'http://localhost:8000',
+<% } else { %>      '/trpc': 'http://localhost:3000',
       '/api': 'http://localhost:3000',
-<% } else { %>      '/api': 'http://localhost:8000',
-<% } %>
-    },
+<% } %>    },
   },
 });

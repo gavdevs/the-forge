@@ -91,11 +91,21 @@ describe('web generator', () => {
       expect(tree.exists('apps/web/src/hooks/.gitkeep')).toBeTruthy();
     });
 
-    it('should emit a vite-env.d.ts that declares routeTree.gen ambiently', async () => {
-      // main.tsx imports './routeTree.gen', which TanStack Router only
-      // generates on the first `vite dev`. Without an ambient declaration,
-      // a fresh project's `pnpm build` (which runs `tsc -b` first) fails
-      // with TS2307 before any dev run produces the file.
+    it('should wire the TanStack Router vite plugin so routeTree.gen is generated', async () => {
+      // Without the plugin, `pnpm build` fails: main.tsx imports
+      // './routeTree.gen' but no generator emits it before tsc runs.
+      await webGenerator(tree, { styling: 'tailwind' });
+
+      const content = tree.read('apps/web/vite.config.ts', 'utf-8')!;
+      expect(content).toContain("from '@tanstack/router-plugin/vite'");
+      expect(content).toContain('tanstackRouter(');
+    });
+
+    it('should emit vite-env.d.ts so tsc -b resolves routeTree.gen before the plugin runs', async () => {
+      // The plugin generates routeTree.gen.ts during vite's transform
+      // pipeline, but `pnpm build` runs `tsc -b` first. The ambient
+      // declaration hides the import from tsc so the first build passes
+      // even before vite has produced the real file.
       await webGenerator(tree, { styling: 'tailwind' });
 
       expect(tree.exists('apps/web/src/vite-env.d.ts')).toBeTruthy();

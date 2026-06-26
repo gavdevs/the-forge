@@ -28,7 +28,8 @@
     "vite": "latest",
     "vitest": "latest",
     "typescript": "latest"<% if (apiFramework === 'python') { %>,
-    "openapi-typescript": "latest"<% } %><% if (styling === 'tailwind') { %>,
+    "openapi-typescript": "latest"<% } %>,
+    "@tanstack/router-plugin": "latest"<% if (styling === 'tailwind') { %>,
     "@tailwindcss/vite": "latest"<% } else { %>,
     "@pandacss/dev": "latest"<% } %>
   }
