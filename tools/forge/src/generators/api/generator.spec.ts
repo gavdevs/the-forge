@@ -238,4 +238,24 @@ describe('api generator: framework python', () => {
     expect(content).toContain('api:');
     expect(content).toContain('8000:8000');
   });
+
+  it('should use the explicit projectName for the python package name (no my-app fallback)', async () => {
+    await apiGenerator(tree, {
+      framework: 'python',
+      database: 'sqlite',
+      projectName: 'open-plate',
+    });
+
+    const pyproject = tree.read('apps/api/pyproject.toml', 'utf-8')!;
+    expect(pyproject).toContain('name = "open-plate-api"');
+    expect(pyproject).not.toContain('name = "my-app-api"');
+  });
+
+  it('should import StaticPool from sqlalchemy.pool (not sqlalchemy.ext.asyncio)', async () => {
+    await apiGenerator(tree, { framework: 'python', database: 'sqlite' });
+
+    const conftest = tree.read('apps/api/tests/conftest.py', 'utf-8')!;
+    expect(conftest).toContain('from sqlalchemy.pool import StaticPool');
+    expect(conftest).not.toContain('from sqlalchemy.ext.asyncio import StaticPool');
+  });
 });

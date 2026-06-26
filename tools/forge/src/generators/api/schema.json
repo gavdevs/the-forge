@@ -24,6 +24,10 @@
     "targetDir": {
       "type": "string",
       "description": "Absolute path to the generated project root. Required when running from forge CLI."
+    },
+    "projectName": {
+      "type": "string",
+      "description": "Project name (matches the root package.json `name` field). When provided, this is used directly for derived values like the Python package name and DB filename, instead of re-reading from disk. Recommended when invoked from the forge CLI."
     }
   },
   "required": []

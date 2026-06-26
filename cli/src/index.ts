@@ -82,7 +82,7 @@ async function main(): Promise<void> {
     switch (app) {
       case 'api':
         runForgeGenerator(
-          `api --framework=${options.backendFramework} --database=${options.database}${optionalFeaturesFlag} ${td}`,
+          `api --framework=${options.backendFramework} --database=${options.database}${optionalFeaturesFlag} --projectName=${options.name} ${td}`,
         );
         break;
       case 'web':

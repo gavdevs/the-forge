@@ -15,6 +15,8 @@
     "@nx/devkit": "^22.6.5",
     "@nx/js": "^22.6.5",
     "@nx/plugin": "^22.6.5",
+    "@swc-node/register": "^1.11.1",
+    "@swc/core": "^1.15.43",
     "@types/node": "^20.19.9",
     "nx": "^22.6.5",
     "typescript": "^6.0.3",

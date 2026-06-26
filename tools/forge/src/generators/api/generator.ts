@@ -36,7 +36,7 @@ export async function apiGenerator(
   // When called from CLI, targetDir is the absolute path to the generated project.
   // When called in tests, targetDir is omitted and we write to tree root.
   const projectRoot = options.targetDir ?? '.';
-  const projectName = readProjectName(tree, projectRoot);
+  const projectName = readProjectName(tree, projectRoot, options.projectName);
 
   if (framework === 'python') {
     return apiGeneratorPython(tree, { database, projectRoot, projectName });
@@ -120,7 +120,14 @@ function apiGeneratorPython(
   updateDockerComposePython(tree, projectRoot, database);
 }
 
-function readProjectName(tree: Tree, projectRoot: string): string {
+function readProjectName(tree: Tree, projectRoot: string, optionsProjectName?: string): string {
+  // Prefer the explicit option when the CLI passes it — reading from the tree
+  // is unreliable when the api generator runs after the workspace generator
+  // (the workspace generator's `tree` writes don't always materialize by the
+  // time the api generator reads them).
+  if (optionsProjectName) {
+    return optionsProjectName;
+  }
   const pkgPath = joinPathFragments(projectRoot, 'package.json');
   if (tree.exists(pkgPath)) {
     const pkg = readJson(tree, pkgPath);
