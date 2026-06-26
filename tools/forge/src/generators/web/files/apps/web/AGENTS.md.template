@@ -5,9 +5,15 @@
 - **React 19** with **Vite**
 - **TanStack Router** — file-based routing
 - **TanStack Query** — server-state caching
-- **tRPC client** — typesafe RPC against `apps/api`
-- **Better Auth** — auth client
-<% if (styling === 'tailwind') { %>- **Tailwind CSS v4** + shadcn/ui primitives
+<% if (apiFramework === 'hono') { %>- **tRPC client** — typesafe RPC against `apps/api` (Hono backend)
+- **Better Auth** — auth client (paired with the Hono API's Better Auth server)
+<% } else { %>- **OpenAPI codegen** — wire types are generated from FastAPI's `/openapi.json`
+  via `pnpm run codegen` (uses `openapi-typescript`). Re-run after every API
+  schema change.
+- **Typed fetch client** — see `src/lib/apiClient.ts`. Pure `fetch` wrapper
+  around `VITE_API_URL`; no auth, no tRPC. Add the URL to `.env`:
+  `VITE_API_URL=http://localhost:8000`.
+<% } %><% if (styling === 'tailwind') { %>- **Tailwind CSS v4** + shadcn/ui primitives
 <% } else { %>- **Panda CSS** + Ark UI
 <% } %>
 
@@ -17,12 +23,16 @@
 apps/web/
 ├── index.html
 ├── src/
-│   ├── main.tsx           # entry: createRouter + QueryClient + tRPC
+│   ├── main.tsx           # entry: createRouter + QueryClient<% if (apiFramework === 'hono') { %> + tRPC<% } %>
 │   ├── routes/            # TanStack file-based routes
 │   ├── components/        # shared UI
 │   ├── hooks/             # custom React hooks
 │   ├── features/          # feature-specific code (created by `feature` generator)
-│   └── lib/               # utilities
+│   └── lib/               # utilities<% if (apiFramework === 'hono') { %>
+│       ├── trpc.ts        # tRPC client
+│       └── auth.ts        # Better Auth client<% } else { %>
+│       ├── apiClient.ts   # typed fetch wrapper
+│       └── api-schema.ts  # GENERATED from /openapi.json (do not edit)<% } %>
 ├── vite.config.ts
 └── package.json
 ```
@@ -34,18 +44,28 @@ pnpm --filter @<%= projectName %>/web dev       # vite dev server
 pnpm --filter @<%= projectName %>/web build     # tsc -b && vite build
 pnpm --filter @<%= projectName %>/web test      # vitest run
 pnpm --filter @<%= projectName %>/web preview   # serve built output
-```
+<% if (apiFramework === 'python') { %>pnpm --filter @<%= projectName %>/web codegen   # refresh api-schema.ts from the running API
+<% } %>```
 
 ## Conventions
 
 - **Routes are file-based** under `src/routes/`. Use TanStack Router's file conventions (`__root.tsx`, `index.tsx`, `$param.tsx`).
 - **Components**: PascalCase, default export, no `any` props. Co-locate small components with the route that owns them; share larger ones via `src/components/`.
-- **Server state** lives in TanStack Query, fed by the tRPC client. Do not call `fetch` directly.
-- **Auth state** lives in the Better Auth client hook. Do not roll your own auth context.
+- **Server state** lives in TanStack Query.
+<% if (apiFramework === 'hono') { %>  - Feed it via the tRPC client (`trpc.x.useQuery()`) — do not call `fetch` directly.
+<% } else { %>  - Feed it via the typed `api` client (`api.get<Recipe>('/recipes/1')`) and
+    TanStack Query. The `api-schema.ts` file is generated; never hand-edit it.
+<% } %><% if (apiFramework === 'hono') { %>- **Auth state** lives in the Better Auth client hook. Do not roll your own auth context.
+<% } %>
 - **No barrel files** inside `src/` — import directly from the file that owns the export.
 
 ## Adding a new feature
 
-```sh
+<% if (apiFramework === 'hono') { %>```sh
 pnpm nx generate @<%= projectName %>/project-plugin:feature --name <name> --apps web
 ```
+<% } else { %>The `feature` generator currently emits tRPC code (Hono-only). For python
+backends, create features manually under `src/features/<name>/`. Co-locate
+the React component, the TanStack Query hook, and any feature-specific types
+in that directory.
+<% } %>

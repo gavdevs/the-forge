@@ -77,7 +77,7 @@ export function printUsage(error?: string): null {
     '',
     'Examples:',
     '  forge my-app --apps api web --framework hono --database postgres',
-    '  forge py-svc --apps api --framework python --database sqlite --yes',
+    '  forge py-svc --apps api web --framework python --database sqlite --yes',
     '  forge launcher --apps web desktop --styling panda --features ai,realtime --yes',
     '',
     'When any flag is provided the CLI runs non-interactively and uses',
@@ -224,9 +224,14 @@ export async function resolveOptions(
           options: [
             {
               value: 'hono',
-              label: 'Hono (TypeScript) — Hono + tRPC + Drizzle + Better Auth',
+              label:
+                'Hono (TypeScript) — Hono + tRPC + Drizzle + Better Auth. The web app gets tRPC + Better Auth too.',
             },
-            { value: 'python', label: 'Python API (FastAPI + SQLAlchemy + uv)' },
+            {
+              value: 'python',
+              label:
+                'Python API (FastAPI + SQLAlchemy + uv). When combined with the web app, the client uses OpenAPI codegen + a typed fetch client.',
+            },
           ],
         });
         if (p.isCancel(prompted)) {

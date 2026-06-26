@@ -1,5 +1,6 @@
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { apiGenerator } from './api/generator';
+import { webGenerator } from './web/generator';
 import { workspaceGenerator } from './workspace/generator';
 
 describe('integration: full project scaffold', () => {
@@ -80,5 +81,42 @@ describe('integration: full project scaffold', () => {
     const compose = tree.read('py-app/docker-compose.yml', 'utf-8')!;
     expect(compose).toContain('api:');
     expect(compose).toContain('8000:8000');
+  });
+
+  it('should scaffold a web app that talks to a Python (FastAPI) backend', async () => {
+    const tree = createTreeWithEmptyWorkspace();
+
+    await workspaceGenerator(tree, {
+      name: 'py-web',
+      projectType: 'standalone',
+      database: 'sqlite',
+      styling: 'tailwind',
+    });
+
+    await apiGenerator(tree, {
+      framework: 'python',
+      database: 'sqlite',
+      targetDir: 'py-web',
+    });
+
+    await webGenerator(tree, {
+      styling: 'tailwind',
+      apiFramework: 'python',
+      targetDir: 'py-web',
+    });
+
+    // Web app ships the python-mode files...
+    expect(tree.exists('py-web/apps/web/src/lib/apiClient.ts')).toBeTruthy();
+    expect(tree.exists('py-web/apps/web/src/lib/api-schema.ts')).toBeTruthy();
+    expect(tree.exists('py-web/apps/web/.env.example')).toBeTruthy();
+
+    // ...and NOT the hono-mode files.
+    expect(tree.exists('py-web/apps/web/src/lib/trpc.ts')).toBeFalsy();
+    expect(tree.exists('py-web/apps/web/src/lib/auth.ts')).toBeFalsy();
+
+    // Web app's vite proxy points at the FastAPI port.
+    const vite = tree.read('py-web/apps/web/vite.config.ts', 'utf-8')!;
+    expect(vite).toContain('localhost:8000');
+    expect(vite).not.toContain('/trpc');
   });
 });

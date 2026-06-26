@@ -1,0 +1,96 @@
+// Typed fetch client for the FastAPI backend.
+//
+// Wire types are generated from FastAPI's OpenAPI schema — see
+// `pnpm run codegen` in apps/web. This file stays minimal: a thin
+// wrapper that injects VITE_API_URL, sets JSON headers, and throws
+// on non-2xx responses. All business logic lives in feature hooks
+// that consume this client through TanStack Query.
+
+/** Read the API base URL once at module load. Throws at import time if unset. */
+const BASE_URL: string = (() => {
+  const url = import.meta.env['VITE_API_URL'];
+  if (typeof url !== 'string' || url.length === 0) {
+    throw new Error(
+      'VITE_API_URL is not set. Copy .env.example to .env and set it to the FastAPI base URL (default: http://localhost:8000).',
+    );
+  }
+  return url.replace(/\/$/, '');
+})();
+
+/** Thrown for any non-2xx response. Includes status + parsed body for diagnostics. */
+export class ApiError extends Error {
+  readonly status: number;
+  readonly body: unknown;
+
+  constructor(status: number, body: unknown, message: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.body = body;
+  }
+}
+
+export interface RequestOptions {
+  body?: unknown;
+  query?: Record<string, string | number | boolean | undefined>;
+}
+
+/**
+ * Execute a request against the API. Generic `T` is the expected JSON
+ * response shape; the call site picks it from the generated schema
+ * (e.g. `import type { paths } from './api-schema'`).
+ */
+export async function apiRequest<T = unknown>(
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
+  let resolvedPath = path;
+  if (options.query) {
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(options.query)) {
+      if (v === undefined) continue;
+      params.set(k, String(v));
+    }
+    const qs = params.toString();
+    if (qs.length > 0) resolvedPath += `?${qs}`;
+  }
+
+  const init: RequestInit = { method, headers: { Accept: 'application/json' } };
+  if (options.body !== undefined) {
+    (init.headers as Record<string, string>)['Content-Type'] = 'application/json';
+    init.body = JSON.stringify(options.body);
+  }
+
+  const response = await fetch(`${BASE_URL}${resolvedPath}`, init);
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const contentType = response.headers.get('content-type') ?? '';
+  const parsed: unknown = contentType.includes('application/json')
+    ? await response.json()
+    : await response.text();
+
+  if (!response.ok) {
+    const detail = typeof parsed === 'object' && parsed !== null && 'detail' in parsed
+      ? String((parsed as { detail: unknown }).detail)
+      : `HTTP ${response.status}`;
+    throw new ApiError(response.status, parsed, detail);
+  }
+
+  return parsed as T;
+}
+
+/** Convenience helpers per method. */
+export const api = {
+  get: <T = unknown>(path: string, options?: RequestOptions): Promise<T> =>
+    apiRequest<T>('GET', path, options),
+  post: <T = unknown>(path: string, options?: RequestOptions): Promise<T> =>
+    apiRequest<T>('POST', path, options),
+  patch: <T = unknown>(path: string, options?: RequestOptions): Promise<T> =>
+    apiRequest<T>('PATCH', path, options),
+  delete: <T = unknown>(path: string, options?: RequestOptions): Promise<T> =>
+    apiRequest<T>('DELETE', path, options),
+};

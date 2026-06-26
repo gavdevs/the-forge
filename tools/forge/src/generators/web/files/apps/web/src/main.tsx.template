@@ -20,6 +20,14 @@ const rootElement = document.getElementById('root')!;
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
+<% if (apiFramework === 'hono') { %>
+      {/* hono: wrap with <trpc.Provider> when you add your first trpc.useQuery() call.
+          See apps/web/src/lib/trpc.ts for the client. */}
+<% } else { %>
+      {/* python: the apiClient (./lib/apiClient.ts) reads VITE_API_URL and works
+          out of the box. Wire types come from `./lib/api-schema.ts` (generated
+          via `pnpm run codegen`). */}
+<% } %>
       <RouterProvider router={router} />
     </QueryClientProvider>
   </React.StrictMode>,

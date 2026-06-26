@@ -1,0 +1,12 @@
+// GENERATED FILE — do not edit.
+// Populated by `pnpm run codegen`, which fetches FastAPI's /openapi.json and
+// writes the typed `paths` object. Until codegen runs this file exports
+// nothing and the apiClient will fall back to `unknown` for response types.
+//
+// Example after codegen:
+//   export type paths = {
+//     '/recipes/{id}': {
+//       get: { responses: { 200: { content: { 'application/json': Recipe } } } }
+//     }
+//   };
+export {};

@@ -86,7 +86,12 @@ async function main(): Promise<void> {
         );
         break;
       case 'web':
-        runForgeGenerator(`web --styling=${options.styling} ${td}`);
+        // Pair the web app's data layer with the chosen backend framework.
+        // Python backends can't use tRPC (it's TS-only) — they get a typed
+        // fetch client + OpenAPI codegen instead. See WebGeneratorSchema.apiFramework.
+        const apiFrameworkFlag =
+          options.backendFramework === 'python' ? ' --apiFramework=python' : '';
+        runForgeGenerator(`web --styling=${options.styling}${apiFrameworkFlag} ${td}`);
         break;
       case 'mobile':
         runForgeGenerator(`mobile ${td}`);

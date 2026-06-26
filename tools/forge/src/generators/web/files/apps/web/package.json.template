@@ -7,27 +7,29 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run"<% if (apiFramework === 'python') { %>,
+    "codegen": "openapi-typescript http://localhost:8000/openapi.json -o src/lib/api-schema.ts"<% } %>
   },
   "dependencies": {
     "react": "latest",
     "react-dom": "latest",
     "@tanstack/react-router": "latest",
-    "@tanstack/react-query": "latest",
+    "@tanstack/react-query": "latest"<% if (apiFramework === 'hono') { %>,
     "@trpc/client": "latest",
     "@trpc/react-query": "latest",
-    "better-auth": "latest",
-<% if (styling === 'tailwind') { %>    "tailwindcss": "latest"
-<% } else { %>    "@ark-ui/react": "latest"
-<% } %>  },
+    "better-auth": "latest"<% } %><% if (styling === 'tailwind') { %>,
+    "tailwindcss": "latest"<% } else { %>,
+    "@ark-ui/react": "latest"<% } %>
+  },
   "devDependencies": {
     "@vitejs/plugin-react": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "vite": "latest",
     "vitest": "latest",
-    "typescript": "latest",
-<% if (styling === 'tailwind') { %>    "@tailwindcss/vite": "latest"
-<% } else { %>    "@pandacss/dev": "latest"
-<% } %>  }
+    "typescript": "latest"<% if (apiFramework === 'python') { %>,
+    "openapi-typescript": "latest"<% } %><% if (styling === 'tailwind') { %>,
+    "@tailwindcss/vite": "latest"<% } else { %>,
+    "@pandacss/dev": "latest"<% } %>
+  }
 }

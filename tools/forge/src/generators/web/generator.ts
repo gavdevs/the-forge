@@ -15,6 +15,9 @@ export async function webGenerator(
   options: WebGeneratorSchema,
 ): Promise<void> {
   const styling = options.styling ?? 'tailwind';
+  // Default to 'hono' for backwards compatibility — existing projects that
+  // invoked `web --styling=tailwind` keep getting tRPC + Better Auth.
+  const apiFramework = options.apiFramework ?? 'hono';
   const projectRoot = options.targetDir ?? '.';
   const projectName = readProjectName(tree, projectRoot);
 
@@ -24,10 +27,24 @@ export async function webGenerator(
     projectRoot,
     {
       styling,
+      apiFramework,
       projectName,
       template: '',
     },
   );
+
+  // The files/ tree contains both hono- and python-only templates. Drop the
+  // ones that don't match the chosen framework so the generated project
+  // doesn't ship dead imports.
+  if (apiFramework === 'python') {
+    for (const path of PYTHON_ONLY_REMOVALS) {
+      tree.delete(joinPathFragments(projectRoot, path));
+    }
+  } else {
+    for (const path of HONO_ONLY_REMOVALS) {
+      tree.delete(joinPathFragments(projectRoot, path));
+    }
+  }
 
   // Create empty directories
   tree.write(joinPathFragments(projectRoot, 'apps/web/src/features/.gitkeep'), '');
@@ -37,6 +54,19 @@ export async function webGenerator(
   // Add web service to docker-compose.yml
   updateDockerCompose(tree, projectRoot);
 }
+
+/** Files emitted only when apiFramework is 'python'. Removed for 'hono'. */
+const PYTHON_ONLY_REMOVALS: readonly string[] = [
+  'apps/web/src/lib/trpc.ts',
+  'apps/web/src/lib/auth.ts',
+];
+
+/** Files emitted only when apiFramework is 'hono'. Removed for 'python'. */
+const HONO_ONLY_REMOVALS: readonly string[] = [
+  'apps/web/src/lib/apiClient.ts',
+  'apps/web/src/lib/api-schema.ts',
+  'apps/web/.env.example',
+];
 
 function readProjectName(tree: Tree, projectRoot: string): string {
   const pkgPath = joinPathFragments(projectRoot, 'package.json');

@@ -10,6 +10,12 @@
       "default": "tailwind",
       "description": "Styling approach"
     },
+    "apiFramework": {
+      "type": "string",
+      "enum": ["hono", "python"],
+      "default": "hono",
+      "description": "Backend framework the web app talks to. 'hono' uses tRPC + Better Auth; 'python' uses a typed fetch client generated from FastAPI's OpenAPI schema. Auto-set by the CLI based on --framework."
+    },
     "targetDir": {
       "type": "string",
       "description": "Absolute path to the generated project root."
