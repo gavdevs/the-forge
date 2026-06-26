@@ -90,6 +90,18 @@ describe('web generator', () => {
       expect(tree.exists('apps/web/src/components/.gitkeep')).toBeTruthy();
       expect(tree.exists('apps/web/src/hooks/.gitkeep')).toBeTruthy();
     });
+
+    it('should emit a vite-env.d.ts that declares routeTree.gen ambiently', async () => {
+      // main.tsx imports './routeTree.gen', which TanStack Router only
+      // generates on the first `vite dev`. Without an ambient declaration,
+      // a fresh project's `pnpm build` (which runs `tsc -b` first) fails
+      // with TS2307 before any dev run produces the file.
+      await webGenerator(tree, { styling: 'tailwind' });
+
+      expect(tree.exists('apps/web/src/vite-env.d.ts')).toBeTruthy();
+      const content = tree.read('apps/web/src/vite-env.d.ts', 'utf-8')!;
+      expect(content).toContain("declare module '*/routeTree.gen'");
+    });
   });
 
   describe('python framework', () => {
